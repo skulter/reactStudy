@@ -11,7 +11,7 @@ class MyComponent extends Component {
     render() {
         return (
             <div>
-                {Component }
+                Component
             </div>
         );
     }

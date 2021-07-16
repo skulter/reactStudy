@@ -1,30 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useReducer } from "react";
+import useInputs from "./useInputs";
 
 const Info = () => {
-  const [name, setName] = useState("");
-  const [nickname, setNickname] = useState("");
-
-  useEffect(() => {
-    console.log("effect");
-    console.log(name);
-    return () => {
-      console.log("cleanup");
-      console.log(name);
-    };
-  }, []);
-
-  const onChangeName = (e) => {
-    setName(e.target.value);
-  };
-
-  const onChangeNickname = (e) => {
-    setNickname(e.target.value);
-  };
+  const [state, onChange] = useInputs({
+    name: "",
+    nickname: "",
+  });
+  const {name, nickname} = state;
 
   return (
     <div>
-      <input value={name} onChange={onChangeName}></input>
-      <input value={nickname} onChange={onChangeNickname}></input>
+      <input name="name" value={name} onChange={onChange}></input>
+      <input name="nickname" value={nickname} onChange={onChange}></input>
       <div>
         <div>
           <b>이름:</b>
