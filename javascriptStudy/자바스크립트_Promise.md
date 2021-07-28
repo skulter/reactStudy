@@ -1,6 +1,6 @@
 자바스크립트 비동기 처리
 =
-웹 브라우저의 가장 대표적인 엔진인 v8엔진을 기반으로 작성되었습니다.
+자바스크립트 엔진중 가장 많이 사용하는 v8엔진을 기반으로 작성되었습니다. (구글 크롬)
 
 
 자바스크립트의 비동기 처리는 특정 코드의 연산이 실행되고있지만 결과를 기다리지 않고 다음 코드를 먼저 실행하는 자바스크립트의 특성을 의미합니다.
@@ -45,19 +45,19 @@ main() 함수는 함수가 호출되었을때 생성되는 함수이다. 그림�
 
 JS가 실행되는 환경을 런타임이라고 하며 JS엔진은 V8말고도 여러가지가 있습니다.
 구글 크롬이나 Node.js에서 JS코드를 실행하면 V8엔진이 코드를 인터프리팅합니다.
-런타임 환경에는 WebAPIs와 EventLoop, Task Queue가 있습니다.
+런타임 환경에는 WebAPI와 EventLoop, Task Queue가 있습니다.
 
-- WebAPIs : WebAPis는 브라우저에서 제공되는 API들이다. setTimeOut, Http 요청(ajax) 메소드, DOM 이벤트 등이 WebAPIs에 속합니다.
+- WebAPI : WebAPI는 브라우저에서 제공되는 API들이다. setTimeout, Http 요청(ajax) 메소드, DOM 이벤트 등이 WebAPI에 속합니다.
 - Task Queue : 이벤트가 발생한 후 호출되어야 할 콜백 함수들이 대기하고있는 공간입니다. 이벤트 루프가 정해준 순서대로 대기하고 있으며 콜백 큐 라고도 합니다.
 - Event Loop : 이벤트 발생 시 호출할 콜백 함수들을 관리하며, 호출된 콜백함수의 실행순서를 결정합니다.
 
 
 ## Task Queue
-자바스크립트에서 비동기 호출되는 함수들(setTimeOut, ajax 등)은 콜 스택에 쌓이지 않고 WebAPI에서 처리 한 후 테스크 큐로 보내진다.
+자바스크립트에서 비동기 호출되는 함수들(setTimeout, ajax 등)은 콜 스택에 쌓이지 않고 WebAPI에서 처리 한 후 테스크 큐로 보내진다.
 
 그럼 아래의 코드가 어떤식으로 비동기 처리가 되는지 알아보겠습니다.
 
-```javscript
+```javascript
 console.log("시작");
 
 setTimeout(()=>{
@@ -76,10 +76,10 @@ console.log("종료");
 - 종료 출력
 - (3초간 대기 후) 실행 중 출력
 
-예상과 달리 실제 결과값과 같이 출력이 된 이유는 setTimeOut()함수가 비동기 방식으로 실행되기 때문에 3초를 기다렸다가 다음 코드가 실행되는것이 아니라 setTimeOut()함수가 실행되고나서 바로 다음 코드가 실행되기 때문입니다.
+예상과 달리 실제 결과값과 같이 출력이 된 이유는 setTimeout()함수가 비동기 방식으로 실행되기 때문에 3초를 기다렸다가 다음 코드가 실행되는것이 아니라 setTimeout()함수가 실행되고나서 바로 다음 코드가 실행되기 때문입니다.
 
 그렇다면 
-```javscript
+```javascript
 console.log("시작");
 
 setTimeout(()=>{
@@ -95,7 +95,7 @@ console.log("종료");
 - 종료
 - 실행 중
 
-순으로 실행이 됩니다. 시간이 0초 더라도 비동기 함수를 사용했으므로 WebAPIs -> 테스크 큐 -> 콜 스택순으로 이동하기 때문입니다.
+순으로 실행이 됩니다. 시간이 0초 더라도 비동기 함수를 사용했으므로 WebAPI -> 테스크 큐 -> 콜 스택순으로 이동하기 때문입니다.
 여기서 중요한 점은 테스크 큐에 대기하고있는 콜백함수는 콜 스택이 비어져있을 때만 이벤트 루프가 콜 스택으로 콜백 함수를 옮겨준다는 점이다.
 위 코드들이 어떻게 실행되는지 이미지로 한번 확인해보겠습니다.
 
@@ -122,22 +122,319 @@ console.log("종료");
 <center><img src="./images/runtime_09.jpg" width="80%" alt="runtime_09"/></center>
 11. console.log("실행 중") 함수가 리턴되고 Call Stack에서 제거되고 CallBack함수도 제거된다.
 
-해당 루틴을 반복하며 EventLoop는 Task Queue에 새로운 콜백함수가 들어올때까지 대기한다.
+해당 루틴을 반복하며 EventLoop는 Task Queue에 새로운 콜백함수가 들어올때까지 대기한다.(이러한 반복적인 행동을 틱(tick)이라 한다.)
 만약 CallStack에 너무 많은 함수들이 있다면 setTimeout에 설정한 시간이 정확하지 않을 수 있다.
 
-# 콜백 함수
+# 콜백
+자바스크립트가 어떤식으로 비동기 함수를 처리하는지 알아보았습니다.
+개발을 하다보면 실행순서가 중요한 경우가 있습니다. 예를 들어 api 요청을 보낸 후 응답을 받은 데이터를 이용해야 하는 상황에서 콜백함수를 사용해주면 된다.
+콜백함수는 현재 실행되고있는 함수가 끝난 후 실행되는 함수를 의미합니다.
 
-콜백지옥 타파하기
+## 콜백 예시
+```javascript
+function first(callback){
+    setTimeout(function(){
+        console.log("첫번째");
+        callback();
+    }, 3000);
+}
+
+function second(){
+    console.log("두번째");
+}
+
+first(function(){
+    second();
+});
+```
+위 코드의 결과는 아래와 같다.
+- 첫번째
+- 두번째
+
+first 함수가 실행되고 3초간 대기 후 "첫번째" 문구가 출력되고 인자로 받은 콜백함수를 실행하여 "두번째" 문구가 출력된다.
+
+## 콜백지옥
+여러개의 api를 호출하여 데이터를 가공해야하거나 화면에 렌더링 해줘야하는 경우 콜백함수를 여러개 중첩을 하게되면 코드를 이해하기 어려워진다. 이런 경우를 콜백 지옥(callback hell)이라고 합니다.
+
+### 콜백지옥 예시
+```javascript
+setTimeout(
+  (name) => {
+    let coffeeList = name;
+    console.log(coffeeList);
+    setTimeout(
+      (name) => {
+        coffeeList += ', ' + name;
+        console.log(coffeeList);
+        setTimeout(
+          (name) => {
+            coffeeList += ', ' + name;
+            console.log(coffeeList);
+            setTimeout(
+              (name) => {
+                coffeeList += ', ' + name;
+                console.log(coffeeList);
+              },
+              500,
+              'Latte',
+            );
+          },
+          500,
+          'Mocha',
+        );
+      },
+      500,
+      'Americano',
+    );
+  },
+  500,
+  'Espresso',
+);
+
+//출력 
+// "Espresso"
+// "Espresso, Americano"
+// "Espresso, Americano, Mocha"
+// "Espresso, Americano, Mocha, Latte"
+```
+한눈에 봐도 가독성이 떨어진다. 앞으로 알아볼 Promise를 이용하여 콜백 지옥을 피해보자
+
+# 프로미스
+콜백 지옥을 피하기위해 ES6(ECMA 2015)부터 프로미스(Promise)가 추가되었습니다.
+
+## 프로미스의 3가지 상태(states)
+프로미스를 사용할 때 알아야 하는 가장 기본적인 개념이 바로 프로미스의 상태(states)이다. 여기서 말하는 상태란 프로미스의 처리 과정이다. `new Promise()`로 프로미스를 생성하고 종료될때까지 프로미스는 3가지의 상태를 갖는다.
+
+- 대기(pending) : 비동기 처리 로직이 아직 완료되지 않은 상태
+- 이행(fulfilled) : 비동기 처리가 완료되어 프로미스가 결과 값을 반환해준 상태 (완료 상태)
+- 거부(rejected) : 비동기 처리가 실패하거나 오류가 발생한 상태
+
+### 대기 (Pending)
+아래와 같이 `new Promise()` 메서드를 호출하면 대기 상태가 됩니다.
+```javascript
+new Promise()
+```
+`new Promise()` 메서드를 호출할 때 콜백 함수를 선언할 수 있다. 콜백 함수의 인자는 resolve, reject가 있다.
+
+```javascript
+const promise = new Promise(function(resolve, reject){
+    ...
+});
+
+// Arrow Function
+const promise = new Promise((resolve, reject) =>(){
+    ...
+});
+```
+
+### 이행 (Fulfilled)
+promise 콜백 함수의 인자 resolve를 실행하면 이행(Fulfilled) 상태가 됩니다.
+```javascript
+new Promise((resolve, reject)=>{
+    resolve();
+})
+```
+promise가 이행 상태가 되면 `then()`을 이용하여 처리 결과 값을 받을 수 있습니다.
+```javascript
+const promise = new Promise((resolve, reject)=>{
+	resolve("성공")
+});
+
+promise.then(message =>{
+	alert(message);
+})
+```
+
+### 실패 (Rejected)
+promise의 콜백함수의 인자 reject를 호출하면 실패(Rejected) 상태가 됩니다.
+```javascript
+const promise = new Promise((resolve, reject)=>{
+	reject("에러")
+});
+
+promise.then().catch(err =>{
+	alert(err);
+})
+```
+실패 상태가 되면 실패 처리의 결과 값을 `catch()`로 받을 수 있습니다.
+
+<center><img src="./images/promise.svg" width="100%" alt="promise"/></center>
+
+### 프로미스 예제
+프로미스 예제를 통하여 어떻게 콜백지옥을 피할 수 있는지 확인해보자
+
+```javascript
+cconst promise = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    let coffeeList = "Espresso";
+    console.log(coffeeList);
+    resolve(coffeeList);
+  }, 500);
+});
+
+promise
+  .then((coffeeList) => {
+    return new Promise((resolve) => {
+      setTimeout(
+        (coffeeName) => {
+          coffeeList += ", " + coffeeName;
+          console.log(coffeeList);
+          return resolve(coffeeList);
+        },
+        500,
+        "Americano"
+      );
+    });
+  })
+  .then((coffeeList) => {
+    return new Promise((resolve) => {
+      setTimeout(
+        (coffeeName) => {
+          coffeeList += ", " + coffeeName;
+          console.log(coffeeList);
+          return resolve(coffeeList);
+        },
+        500,
+        "Mocha"
+      );
+    });
+  })
+  .then((coffeeList) => {
+    return new Promise((resolve) => {
+      setTimeout(
+        (coffeeName) => {
+          coffeeList += ", " + coffeeName;
+          console.log(coffeeList);
+        },
+        500,
+        "Latte"
+      );
+    });
+  });
+
+//출력 
+// "Espresso"
+// "Espresso, Americano"
+// "Espresso, Americano, Mocha"
+// "Espresso, Americano, Mocha, Latte"
+```
+프로미스를 연결하여 비동기 처리를 순서대로 해주는 것을 `프로미스 체이닝`이라 합니다.
+위 코드를 더욱 간단하게 바꿔주면
+```javascript
+function addCofee(coffeeName){
+	return (coffeeList) => {
+    return new Promise((resolve) => {
+      setTimeout(
+        () => {
+          coffeeList += ", " + coffeeName;
+          console.log(coffeeList);
+          return resolve(coffeeList);
+        },500);
+    });
+  }
+}
+
+const promise = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    let coffeeList = "Espresso";
+    console.log(coffeeList);
+    resolve(coffeeList);
+  }, 500);
+});
+
+promise
+  .then(addCofee("Americano"))
+  .then(addCofee("Mocha"))
+  .then(addCofee("Latte"))
+
+//출력 
+// "Espresso"
+// "Espresso, Americano"
+// "Espresso, Americano, Mocha"
+// "Espresso, Americano, Mocha, Latte"
+```
+위 코드와 같이 반복적인 코드는 함수화 하여 표현하면 더욱 깔끔하게 콜백함수를 관리할 수 있습니다.
+프로미스의 문법과 프로미스 체이닝을 알아보았습니다.
+
+그렇다면 아래 코드는 어떤순서대로 실행되는지 알아보겠습니다.
+```javascript
+console.log('script start'); 
+
+setTimeout(function() {
+  console.log('setTimeout');
+}, 0);
+
+Promise.resolve().then(function() {
+  console.log('promise1');
+}).then(function() {
+  console.log('promise2');
+});
+
+console.log('script end');
+```
+위 코드는
+처음에 배웠던 자바스크립트의 동작방식으로 본다면 아래와 같은 순으로 출력되어야 합니다.
+```javascript
+script start
+script end
+setTimeout
+promise1
+promise2
+```
+하지만 실제로 동작하는 방식은 아래와 같은 순으로 출력이 됩니다.
+```javascript
+script start
+script end
+promise1
+promise2
+setTimeout
+```
+위와 같이 출력되는 이유를 알아보도록 하겠습니다.
 
 
-프로미스의 3가지 상태(states)
-pandding
-fulfilled
-rejected
+# Task Queue, Microtask Queue, Animation Frames
 
-error잡기는 두가지가있지만 catch 사용 권장
+이전까지는 모든 비동기 처리는 Task Queue에 순서대로 쌓이고 이벤트 루프에 의하여 하나씩 꺼내 콜스택으로 옮겨주고 실행을 하게 된다. 라고 설명을 하였는데 더 알아보니 Task Queue외에도 Microtask Queue와 Animation Frames또한 존재한다는 것을 알게되었습니다. 
+<center><img src="./images/microtask.png" width="100%" alt="promise"/></center>
+이해를 돕기 위한 사진
 
-promise 사용
+## Microtask Queue
+결론부터 말하자면 Promise는 Microtask Quere를 사용합니다.
+Microtask Queue에는 Promise와 Mutation observer에 등록된 콜백이 들어오게 됩니다.
+Microtask Queue는 이벤트 루프가 한 번 방문하게되면 MicroTask Queue에 있는 모든 작업을 수행하게 됩니다. 즉, `Microtask Queue가 완전히 비어질 때까지 이벤트 루프는 순회하지 못합니다.(도중에 새로운 작업이 도착하면 새로운 작업도 실행)`
+
+## AnimationFrames 
+WebAPI인 requestAnimationFrame() 함수를 호출하게 되면 그 안에 등록된콜백이 RAF Queue에  쌓여진다.RAF도 Microtask Queue와 마찬가지로 이벤트 루프가 한 번 방문하면 큐 안에 들어있는 '모든' 작업을 수행한 후 순회를 재개합니다.
+`RAF는 보통 애니메이션과 게임 같이 실시간으로 화면에 업데이트 해야하는 경우에 사용합니다.`
+
+### Queue의 우선 순위
+이벤트 루프는 콜 스택에 처리할 작업이 없을 경우 Microtask Queue를 확인한다.
+microtask Queue에 작업이 있다면 작업을 하나씩 꺼내 콜 스택에 넣어준다.
+microtask Queue에 존재하는 작업을 모두 처리하면 다음으로 AnimationFrames를 확인하여 브라우저 렌더링을 발생시킨다. 그 후 task queue에 있는 작업을 하나씩 꺼내 콜 스택에 넣어주고 처리한다.
+여기서 Animation Frames와 task queue는 Animation Frame의 Vsync에 맞춰 호출(60hz)되므로 requestAnimationFrame의 동작시간이 16ms가 넘어가면 task가 먼저 호출되기도 한다.
+```javascript
+function test() {
+  console.log(`onKeyDown`);
+
+  requestAnimationFrame(function () {
+    console.log(`animation`);
+  });
+
+  Promise.resolve().then(function () {
+    console.log(`promise`);
+  });
+
+  setTimeout(function () {
+    console.log(`setTimeout`);
+  }, 0);
+}
+
+//출력 테스트
+//"onKeyDown"
+//"promise"
+//"setTimeout"
+//"animation"
+```
 
 await async 사용
 
