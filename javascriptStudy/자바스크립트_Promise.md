@@ -177,20 +177,16 @@ first 함수가 실행되고 3초간 대기 후 "첫번째" 문구가 출력되�
 ```javascript
 setTimeout(
   (name) => {
-    let coffeeList = name;
-    console.log(coffeeList);
+    console.log(name);
     setTimeout(
       (name) => {
-        coffeeList += ", " + name;
-        console.log(coffeeList);
+        console.log(name);
         setTimeout(
           (name) => {
-            coffeeList += ", " + name;
-            console.log(coffeeList);
+            console.log(name);
             setTimeout(
               (name) => {
-                coffeeList += ", " + name;
-                console.log(coffeeList);
+                console.log(name);
               },
               500,
               "Latte"
@@ -209,10 +205,10 @@ setTimeout(
 );
 
 //출력
-// "Espresso"
-// "Espresso, Americano"
-// "Espresso, Americano, Mocha"
-// "Espresso, Americano, Mocha, Latte"
+//"Espresso"
+//"Americano"
+//"Mocha"
+//"Latte"
 ```
 
 한눈에 봐도 가독성이 떨어진다. 앞으로 알아볼 Promise를 이용하여 콜백 지옥을 피해보자
@@ -295,11 +291,10 @@ promise.then().catch((err) => {
 프로미스 예제를 통하여 어떻게 콜백지옥을 피할 수 있는지 확인해보자
 
 ```javascript
-cconst promise = new Promise((resolve, reject) => {
+const promise = new Promise((resolve, reject) => {
   setTimeout(() => {
-    let coffeeList = "Espresso";
-    console.log(coffeeList);
-    resolve(coffeeList);
+    console.log("Espresso");
+    resolve();
   }, 500);
 });
 
@@ -308,9 +303,8 @@ promise
     return new Promise((resolve) => {
       setTimeout(
         (coffeeName) => {
-          coffeeList += ", " + coffeeName;
-          console.log(coffeeList);
-          return resolve(coffeeList);
+          console.log(coffeeName);
+          return resolve();
         },
         500,
         "Americano"
@@ -321,9 +315,8 @@ promise
     return new Promise((resolve) => {
       setTimeout(
         (coffeeName) => {
-          coffeeList += ", " + coffeeName;
-          console.log(coffeeList);
-          return resolve(coffeeList);
+          console.log(coffeeName);
+          return resolve();
         },
         500,
         "Mocha"
@@ -334,8 +327,7 @@ promise
     return new Promise((resolve) => {
       setTimeout(
         (coffeeName) => {
-          coffeeList += ", " + coffeeName;
-          console.log(coffeeList);
+          console.log(coffeeName);
         },
         500,
         "Latte"
@@ -344,10 +336,10 @@ promise
   });
 
 //출력
-// "Espresso"
-// "Espresso, Americano"
-// "Espresso, Americano, Mocha"
-// "Espresso, Americano, Mocha, Latte"
+//"Espresso"
+//"Americano"
+//"Mocha"
+//"Latte"
 ```
 
 프로미스를 연결하여 비동기 처리를 순서대로 해주는 것을 `프로미스 체이닝`이라 합니다.
@@ -355,12 +347,11 @@ promise
 
 ```javascript
 function addCoffee(coffeeName) {
-  return (coffeeList) => {
+  return () => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        coffeeList += ", " + coffeeName;
-        console.log(coffeeList);
-        return resolve(coffeeList);
+        console.log(coffeeName);
+        return resolve();
       }, 500);
     });
   };
@@ -370,7 +361,7 @@ const promise = new Promise((resolve, reject) => {
   setTimeout(() => {
     let coffeeList = "Espresso";
     console.log(coffeeList);
-    resolve(coffeeList);
+    resolve();
   }, 500);
 });
 
@@ -380,10 +371,10 @@ promise
   .then(addCoffee("Latte"));
 
 //출력
-// "Espresso"
-// "Espresso, Americano"
-// "Espresso, Americano, Mocha"
-// "Espresso, Americano, Mocha, Latte"
+//"Espresso"
+//"Americano"
+//"Mocha"
+//"Latte"
 ```
 
 위 코드와 같이 반복적인 코드는 함수화 하여 표현하면 더욱 깔끔하게 콜백함수를 관리할 수 있습니다.
@@ -489,28 +480,21 @@ async/await는 이해하기 쉽고 사용법도 어렵지 않다.
 위에서 보았던 커피리스트를 나열하는 예제를 async/await 문법으로 바꿔보자.
 
 ```javascript
-
 async function addCoffee(coffeeName) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(coffeeName);
+    	console.log(coffeeName);
+      resolve();
     }, 500);
   });
 }
 
 async function coffeeMaker() {
-	let coffeeList = "";
-  let _addCoffee = async (name) => {
-    coffeeList += (coffeeList ? ', ' : '') + (await addCoffee(name));
-  };
-  await _addCoffee("Espresso");
-  console.log(coffeeList);
-  await _addCoffee("Americano");
-  console.log(coffeeList);
-  await _addCoffee("Mocha");
-  console.log(coffeeList);
-  await _addCoffee("Latte");
-  console.log(coffeeList);
+  await addCoffee("Espresso");
+  await addCoffee("Americano");
+  await addCoffee("Mocha");
+  await addCoffee("Latte");
+  
 }
 coffeeMaker();
 ```
@@ -520,32 +504,24 @@ coffeeMaker();
 async/await를 사용할 때 예외처리를 하는법은 try catch를 사용하면 됩니다.
 
 ```javascript
-
 async function addCoffee(coffeeName) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
     	if(coffeeName === "Mocha"){
       	reject("에러발생!!")
       }
-      resolve(coffeeName);
+      console.log(coffeeName);
+      resolve();
     }, 500);
   });
 }
 
 async function coffeeMaker() {
-	let coffeeList = "";
-  let _addCoffee = async (name) => {
-    coffeeList += (coffeeList ? ', ' : '') + (await addCoffee(name));
-  };
   try{
-    await _addCoffee("Espresso");
-    console.log(coffeeList);
-    await _addCoffee("Americano");
-    console.log(coffeeList);
-    await _addCoffee("Mocha");
-    console.log(coffeeList);
-    await _addCoffee("Latte");
-    console.log(coffeeList);
+    await addCoffee("Espresso");
+    await addCoffee("Americano");
+    await addCoffee("Mocha");
+    await addCoffee("Latte");
   }catch(e){
     console.log(e);
   }
@@ -557,11 +533,20 @@ coffeeMaker();
 
 출처
 https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise
+
 https://velog.io/@bigbrothershin/JavaScript-Promise-%EC%83%9D%EC%84%B1%EC%9E%90
+
 https://velog.io/@thms200/Event-Loop-%EC%9D%B4%EB%B2%A4%ED%8A%B8-%EB%A3%A8%ED%94%84
+
 https://joshua1988.github.io/web-development/javascript/js-async-await/
+
 https://ingg.dev/js-work/#async
+
 https://velog.io/@1703979/TIL-19
+
 https://velog.io/@yujo/JS%EC%BD%9C%EB%B0%B1-%EC%A7%80%EC%98%A5%EA%B3%BC-%EB%B9%84%EB%8F%99%EA%B8%B0-%EC%A0%9C%EC%96%B4
+
 https://meetup.toast.com/posts/89
+
 https://joshua1988.github.io/web-development/javascript/js-async-await/#async--await%EB%8A%94-%EB%AD%94%EA%B0%80%EC%9A%94
+
