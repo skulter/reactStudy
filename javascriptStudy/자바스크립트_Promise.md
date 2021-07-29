@@ -38,7 +38,7 @@ first();
 
 <center><img src="./images/Call_Stack_1.png" width="25%" height="25%" alt="Call Stack 설명"/></center>
 
-main() 함수는 함수가 호출되었을때 생성되는 함수이다. 그림을 보면 third(), seconde(), first(), main() 순으로 Pop되며 main() 함수까지 실행이 완료되면 호출 스택이 지워집니다.
+main() 함수는 함수가 호출되었을때 생성되는 함수입니다. 그림을 보면 third(), seconde(), first(), main() 순으로 Pop되며 main() 함수까지 실행이 완료되면 호출 스택이 지워집니다.
 위 코드를 실행하면
 
 - 세번째
@@ -53,7 +53,7 @@ JS가 실행되는 환경을 런타임이라고 하며 JS엔진은 V8말고도 �
 구글 크롬이나 Node.js에서 JS코드를 실행하면 V8엔진이 코드를 인터프리팅합니다.
 런타임 환경에는 WebAPI와 EventLoop, Task Queue가 있습니다.
 
-- WebAPI : WebAPI는 브라우저에서 제공되는 API들이다. setTimeout, Http 요청(ajax) 메소드, DOM 이벤트 등이 WebAPI에 속합니다.
+- WebAPI : WebAPI는 브라우저에서 제공되는 API 입니다. setTimeout, Http 요청(ajax) 메소드, DOM 이벤트 등이 WebAPI에 속합니다.
 - Task Queue : 이벤트가 발생한 후 호출되어야 할 콜백 함수들이 대기하고있는 공간입니다. 이벤트 루프가 정해준 순서대로 대기하고 있으며 콜백 큐 라고도 합니다.
 - Event Loop : 이벤트 발생 시 호출할 콜백 함수들을 관리하며, 호출된 콜백함수의 실행순서를 결정합니다.
 
@@ -108,38 +108,49 @@ console.log("종료");
 - 실행 중
 
 순으로 실행이 됩니다. 시간이 0초 더라도 비동기 함수를 사용했으므로 WebAPI -> 테스크 큐 -> 콜 스택순으로 이동하기 때문입니다.
-여기서 중요한 점은 테스크 큐에 대기하고있는 콜백함수는 콜 스택이 비어져있을 때만 이벤트 루프가 콜 스택으로 콜백 함수를 옮겨준다는 점이다.
+여기서 중요한 점은 테스크 큐에 대기하고있는 콜백함수는 콜 스택이 비어져있을 때만 이벤트 루프가 콜 스택으로 콜백 함수를 옮겨줍니다.
 위 코드들이 어떻게 실행되는지 이미지로 한번 확인해보겠습니다.
 
 <center><img src="./images/runtime_01.jpg" width="80%" alt="runtime_01"/></center>
-1. 함수가 실행되면서 먼저 main()함수가 Call Stack에 쌓이고 console.log("시작)이 Call Stack에 쌓이고. 바로 실행되어 콘솔에 "시작"이 출력됩니다.
+1. 함수가 실행되면서 먼저 main()함수가 Call Stack에 쌓이고 console.log("시작)이 Call Stack에 쌓이고. 바로 실행되어 콘솔에 "시작"이 출력됩니다.  
+   <br/><br/>
 <center><img src="./images/runtime_02.jpg" width="80%" alt="runtime_02"/></center>
 2. console.log("시작")이 리턴되고 Call Stack에서 제거됩니다.
+<br/><br/>
 <center><img src="./images/runtime_03.jpg" width="80%" alt="runtime_03"/></center>
 3. setTimeout() 함수가 실행이 되면서 Call Stack에 setTimeout함수가 들어가고. setTimeout 함수는 콜백 함수이므로 자바스크립트 엔진이 처리하지 않고 Web API로 전달하여 작업을 요청합니다.
+<br/><br/>
 <center><img src="./images/runtime_04.jpg" width="80%" alt="runtime_04"/></center>
 4. Call Stack에서는 setTimeout이 제거되고 Web API가 setTimeout을 처리합니다.
+<br/><br/>
 <center><img src="./images/runtime_05_01.jpg" width="80%" alt="runtime_05"/></center>
 5. console.log("종료") 함수가 실행되며 Call Stack에 쌓이고 실행되어 콘솔에 "종료" 가 출력됩니다.
+<br/><br/>
 <center><img src="./images/runtime_05_02.jpg" width="80%" alt="runtime_05"/></center>
 6. Call Stack에 있던 console.log("종료") 함수가 리턴되며 제거됩니다.
+<br/><br/>
 <center><img src="./images/runtime_05.jpg" width="80%" alt="runtime_05"/></center>
 7. 모든 함수의 실행이 종료되었으므료 main() 함수가 리턴되며 Call Stack에서 제거됩니다.
+<br/><br/>
 <center><img src="./images/runtime_06.jpg" width="80%" alt="runtime_06"/></center>
 8. setTimeout의 시간이 종료되었으면 Task Queue로 CallBack함수를 보내준다.
+<br/><br/>
 <center><img src="./images/runtime_07.jpg" width="80%" alt="runtime_07"/></center>
 9. Call Stack가 비어잇으면 Event Loop가 Task Queue에 존재하는 함수를 하나씩 꺼내 Call Stack으로 옮겨준다.
+<br/><br/>
 <center><img src="./images/runtime_08.jpg" width="80%" alt="runtime_08"/></center>
 10. Call Stack 함수에 들어간 console.log("실행 중")함수가 실행되고 콘솔창에는 "실행 중"이 출력됩니다.
+<br/><br/>
 <center><img src="./images/runtime_09.jpg" width="80%" alt="runtime_09"/></center>
-11. console.log("실행 중") 함수가 리턴되고 Call Stack에서 제거되고 CallBack함수도 제거됩니다.
+11.  console.log("실행 중") 함수가 리턴되고 Call Stack에서 제거되고 CallBack함수도 제거됩니다.
+<br/><br/>
 
-해당 루틴을 반복하며 EventLoop는 Task Queue에 새로운 콜백함수가 들어올때까지 대기합니다.(이러한 반복적인 행동을 틱(tick)이라 합니다.)
-만약 CallStack에 너무 많은 함수들이 있다면 setTimeout에 설정한 시간이 정확하지 않을 수 있다.
+해당 행위를 반복하며 EventLoop는 Task Queue에 새로운 콜백함수가 들어올때까지 대기합니다.(이러한 반복적인 행동을 틱(tick)이라 합니다.)
+만약 콜 스택에 너무 많은 함수들이 존재한다면 setTimeout에 설정한 시간이 정확하지 않을 수 있습니다.
 
 # 콜백
 
-자바스크립트가 어떤식으로 비동기 함수를 처리하는지 알아보았습니다.
+자바스크립트가 어떤식으로 비동기 함수를 처리하는지 알아보았습니다.  
 개발을 하다보면 실행순서가 중요한 경우가 있습니다. 예를 들어 api 요청을 보낸 후 응답을 받은 데이터를 이용해야 하는 상황에서 콜백함수를 사용해주면 됩니다.
 콜백함수는 현재 실행되고있는 함수가 끝난 후 실행되는 함수를 의미합니다.
 
@@ -170,8 +181,9 @@ first(function () {
 first 함수가 실행되고 3초간 대기 후 "첫번째" 문구가 출력되고 인자로 받은 콜백함수를 실행하여 "두번째" 문구가 출력됩니다.
 
 ## 콜백지옥
-
-여러개의 api를 호출하여 데이터를 가공해야하거나 화면에 렌더링 해줘야하는 경우 콜백함수를 여러개 중첩을 하게되면 코드를 이해하기 어려워진다. 이런 경우를 콜백 지옥(callback hell)이라고 합니다.
+비동기 처리와 콜백함수를 알아보았습니다.  
+콜백함수를 많이 쓰게 되었을때 나타나는 문제점과 피하는 방법을 알아보도록 하겠습니다.  
+여러개의 api를 호출하여 데이터를 가공해야하거나 화면에 렌더링 해줘야하는 경우 콜백함수를 여러개 중첩 하게되면 코드를 이해하기 어려워집니다. 이런 경우를 콜백 지옥(callback hell)이라고 합니다.
 
 ### 콜백지옥 예시
 
@@ -212,15 +224,15 @@ setTimeout(
 //"Latte"
 ```
 
-한눈에 봐도 가독성이 떨어진다. 앞으로 알아볼 Promise를 이용하여 콜백 지옥을 피해보자
+한눈에 봐도 가독성이 떨어집니다. 앞으로 알아볼 Promise를 이용하여 콜백 지옥을 피하고 가독성이 좋은 코드로 만들어 보도록 하겠습니다.
 
 # 프로미스
 
-콜백 지옥을 피하기위해 ES6(ECMA 2015)부터 프로미스(Promise)가 추가되었습니다.
+콜백 지옥을 피하고 비동기 처리를 쉽게 처리할수 있도록 하기 위하여 ES6(ECMA 2015)부터 프로미스(Promise)가 추가되었습니다.
 
 ## 프로미스의 3가지 상태(states)
 
-프로미스를 사용할 때 알아야 하는 가장 기본적인 개념이 바로 프로미스의 상태(states)이다. 여기서 말하는 상태란 프로미스의 처리 과정이다. `new Promise()`로 프로미스를 생성하고 종료될때까지 프로미스는 3가지의 상태를 갖는다.
+프로미스를 사용할 때 알아야 하는 가장 기본적인 개념이 바로 프로미스의 `상태(states)`입니다. 여기서 말하는 상태란 프로미스의 처리 과정입니다. `new Promise()`로 프로미스를 생성하고 종료될때까지 프로미스는 3가지의 상태를 갖습니다.
 
 - 대기(pending) : 비동기 처리 로직이 아직 완료되지 않은 상태
 - 이행(fulfilled) : 비동기 처리가 완료되어 프로미스가 결과 값을 반환해준 상태 (완료 상태)
@@ -234,7 +246,7 @@ setTimeout(
 new Promise();
 ```
 
-`new Promise()` 메서드를 호출할 때 콜백 함수를 선언할 수 있다. 콜백 함수의 인자는 resolve, reject가 있다.
+`new Promise()` 메서드를 호출할 때 콜백 함수를 선언할 수 있습니다. 콜백 함수의 인자는 resolve, reject가 있습니다.
 
 ```javascript
 const promise = new Promise(function(resolve, reject){
@@ -286,9 +298,9 @@ promise.then().catch((err) => {
 실패 상태가 되면 실패 처리의 결과 값을 `catch()`로 받을 수 있습니다.
 
 <center><img src="./images/promise.svg" width="100%" alt="promise"/></center>
+프로미스의 처리 흐름  <br/><br/>
 
 ### 프로미스 예제
-
 프로미스 예제를 통하여 어떻게 콜백지옥을 피할 수 있는지 확인해보자
 
 ```javascript
@@ -445,7 +457,7 @@ WebAPI인 requestAnimationFrame() 함수를 호출하게 되면 그 안에 등�
 ### Queue의 우선 순위
 
 이벤트 루프는 콜 스택에 처리할 작업이 없을 경우 Microtask Queue를 확인합니다.
-microtask Queue에 작업이 있다면 작업을 하나씩 꺼내 콜 스택에 넣어준다.
+microtask Queue에 작업이 있습니다.면 작업을 하나씩 꺼내 콜 스택에 넣어준다.
 microtask Queue에 존재하는 작업을 모두 처리하면 다음으로 AnimationFrames를 확인하여 브라우저 렌더링을 발생시킨다. 그 후 task queue에 있는 작업을 하나씩 꺼내 콜 스택에 넣어주고 처리합니다.
 여기서 Animation Frames와 task queue는 Animation Frame의 Vsync에 맞춰 호출(60hz)되므로 requestAnimationFrame의 동작시간이 16ms가 넘어가면 task가 먼저 호출되기도 합니다.(이 역시 브라우저마다 다르다.)
 
@@ -475,7 +487,7 @@ function test() {
 
 # async/await
 
-async와 await는 ECMAScript 2017(ES8)부터 추가된 기능들이다. 비동기 처리 패턴 중 가장 최근에 나온 문법이며, 기존의 Promise보다 가독성이 좋아 많이 사용되고 있다.
+async와 await는 ECMAScript 2017(ES8)부터 추가된 기능들 입니다. 비동기 처리 패턴 중 가장 최근에 나온 문법이며, 기존의 Promise보다 가독성이 좋아 많이 사용되고 있습니다..
 async/await는 이해하기 쉽고 사용법도 어렵지 않다.
 
 위에서 보았던 커피리스트를 나열하는 예제를 async/await 문법으로 바꿔보자.
