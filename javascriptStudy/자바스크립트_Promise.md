@@ -32,6 +32,7 @@ function second() {
 function third() {
   console.log("세번째");
 }
+
 first();
 ```
 
@@ -483,7 +484,7 @@ async/await는 이해하기 쉽고 사용법도 어렵지 않다.
 async function addCoffee(coffeeName) {
   return new Promise((resolve) => {
     setTimeout(() => {
-    	console.log(coffeeName);
+      console.log(coffeeName);
       resolve();
     }, 500);
   });
@@ -531,7 +532,8 @@ coffeeMaker();
 
 
 
-출처
+참고자료 : 
+
 https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise
 
 https://velog.io/@bigbrothershin/JavaScript-Promise-%EC%83%9D%EC%84%B1%EC%9E%90
