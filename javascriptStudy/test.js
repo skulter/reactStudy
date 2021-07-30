@@ -26,7 +26,7 @@ promise
         (coffeeName) => {
           coffeeList += ", " + coffeeName;
           console.log(coffeeList);
-          return coffeeList;
+          return resolve(coffeeList);
         },
         500,
         "Mocha"
