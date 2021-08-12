@@ -6,11 +6,11 @@
     console.log(sum);
     
     function getImg(){
-        document.getElementById("test").src="./images/render/test4.jpg"
+        document.getElementById("test").src="./images/render/test4.jpg?33"
         
     }
     function getImg2(){
-        document.getElementById("test2").src="./images/render/test5.jpg";
+        document.getElementById("test2").src="./images/render/test5.jpg?22";
     }
     
     getImg();
