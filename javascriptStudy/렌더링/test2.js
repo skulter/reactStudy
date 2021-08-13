@@ -1,5 +1,8 @@
-var sum = 0 ;
-// for(var i = 0 ; i < 1000000000 ; i++){}
+var sum = 0;
+for (var i = 0; i < 1000000000; i++) {
+  sum = i;
+}
+console.log(sum);
 function ajax(id,type) {
   const xhr = new XMLHttpRequest();
   xhr.open("GET", "https://source.unsplash.com/400x300?"+type, true);
